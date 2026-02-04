@@ -72,7 +72,6 @@
 
 ---
 
-## Quick Start
 ## Quick Start (Clone → Build → Run)
 
 ---
@@ -82,14 +81,36 @@
 cd ~
 git clone git@github.com:lee-robot-lab/roboarm_ws.git
 cd roboarm_ws
+```
 
-## 의존성 설치 (rosdep)
 
----
-
-### 1) rosdep 초기 설정 (처음 1회만)
+### 1) 의존성 설치
 ```bash
 sudo apt update
 rosdep update
 cd ~/roboarm_ws
 rosdep install --from-paths src --ignore-src -r -y
+```
+
+### 2) Build
+```bash
+source /opt/ros/humble/setup.bash
+cd ~/roboarm_ws
+colcon build
+```
+### 3) 실행: MuJoCo 시뮬 + 컨트롤러 (터미널 2개)
+
+### 4) 실행: MuJoCo 플랜트 + 컨트롤러 (터미널 2개)
+
+#### Terminal 1) MuJoCo 플랜트 실행 (시뮬레이터)
+```bash
+source /opt/ros/humble/setup.bash
+source ~/roboarm_ws/install/setup.bash
+ros2 launch arm_bringup mujoco_only.launch.py
+```
+#### Terminal 2) 중력보상 + 목표각 추종 실행
+```bashsource /opt/ros/humble/setup.bash
+source ~/roboarm_ws/install/setup.bash
+
+ros2 run arm_control gravity_comp_controller
+```
