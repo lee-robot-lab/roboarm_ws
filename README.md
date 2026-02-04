@@ -100,7 +100,6 @@ colcon build
 ```
 ### 3) 실행: MuJoCo 시뮬 + 컨트롤러 (터미널 2개)
 
-### 4) 실행: MuJoCo 플랜트 + 컨트롤러 (터미널 2개)
 
 #### Terminal 1) MuJoCo 플랜트 실행 (시뮬레이터)
 ```bash
