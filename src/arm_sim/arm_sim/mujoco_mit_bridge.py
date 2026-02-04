@@ -13,23 +13,29 @@ class MujocoMitBridge(Node):
         super().__init__("mujoco_mit_bridge")
 
         self.declare_parameter("xml_path", "robot.xml")
-        self.declare_parameter("motor_id", 1)
-        self.declare_parameter("joint_index", 0)     # j1 -> 0
-        self.declare_parameter("actuator_index", 0)  # a_j1 -> 0
         self.declare_parameter("publish_hz", 200.0)
         self.declare_parameter("use_viewer", True)
 
+        # multi-motor mapping
+        self.declare_parameter("motor_ids", [1, 2, 3, 4])
+        self.declare_parameter("joint_indices", [0, 1, 2, 3])
+        self.declare_parameter("actuator_indices", [0, 1, 2, 3])
+
         xml_path = self.get_parameter("xml_path").value
-        self.motor_id = int(self.get_parameter("motor_id").value)
-        self.jidx = int(self.get_parameter("joint_index").value)
-        self.aidx = int(self.get_parameter("actuator_index").value)
         self.hz = float(self.get_parameter("publish_hz").value)
         self.use_viewer = bool(self.get_parameter("use_viewer").value)
+
+        self.motor_ids = list(self.get_parameter("motor_ids").value)
+        self.joint_indices = list(self.get_parameter("joint_indices").value)
+        self.actuator_indices = list(self.get_parameter("actuator_indices").value)
+
+        if not (len(self.motor_ids) == len(self.joint_indices) == len(self.actuator_indices)):
+            raise RuntimeError("motor_ids/joint_indices/actuator_indices must have same length")
 
         qos = QoSProfile(
             reliability=ReliabilityPolicy.BEST_EFFORT,
             history=HistoryPolicy.KEEP_LAST,
-            depth=1,
+            depth=10,
         )
 
         self.pub_state = self.create_publisher(MitState, "/arm/mit_state", qos)
@@ -38,52 +44,66 @@ class MujocoMitBridge(Node):
         self.model = mujoco.MjModel.from_xml_path(xml_path)
         self.data = mujoco.MjData(self.model)
 
-        # latest command
-        self.latest_cmd = MitCommand()
-        self.latest_cmd.motor_id = self.motor_id
-        self.latest_cmd.q_des = 0.0
-        self.latest_cmd.qd_des = 0.0
-        self.latest_cmd.kp = 20.0
-        self.latest_cmd.kd = 0.5
-        self.latest_cmd.tau_ff = 0.0
+        # latest commands per motor_id
+        self.latest_cmd = {}
+        for mid in self.motor_ids:
+            cmd = MitCommand()
+            cmd.motor_id = int(mid)
+            cmd.q_des = 0.0
+            cmd.qd_des = 0.0
+            cmd.kp = 20.0
+            cmd.kd = 0.5
+            cmd.tau_ff = 0.0
+            self.latest_cmd[int(mid)] = cmd
 
         self.viewer = None
         if self.use_viewer:
             self.viewer = mujoco.viewer.launch_passive(self.model, self.data)
 
         self.timer = self.create_timer(1.0 / self.hz, self.step_and_publish)
-        self.get_logger().info(f"Loaded MJCF: {xml_path} | hz={self.hz} | jidx={self.jidx} | aidx={self.aidx}")
+        self.get_logger().info(
+            f"Loaded MJCF: {xml_path} | hz={self.hz} | motors={self.motor_ids} "
+            f"| joints={self.joint_indices} | actuators={self.actuator_indices}"
+        )
 
     def on_cmd(self, msg: MitCommand):
-        if msg.motor_id != self.motor_id:
+        mid = int(msg.motor_id)
+        if mid not in self.latest_cmd:
             return
-        self.latest_cmd = msg
+        self.latest_cmd[mid] = msg
 
     def step_and_publish(self):
-        # Apply q_des to position actuator
-        self.data.ctrl[self.aidx] = float(self.latest_cmd.q_des)
+        # apply all motor commands
+        for mid, jidx, aidx in zip(self.motor_ids, self.joint_indices, self.actuator_indices):
+            cmd = self.latest_cmd[int(mid)]
+            self.data.ctrl[int(aidx)] = float(cmd.q_des)
 
         mujoco.mj_step(self.model, self.data)
 
-        q = float(self.data.qpos[self.jidx])
-        qd = float(self.data.qvel[self.jidx])
+        now_msg = self.get_clock().now().to_msg()
 
-        # Torque estimate (optional)
-        tau = 0.0
-        try:
-            tau = float(self.data.qfrc_actuator[self.jidx])
-        except Exception:
-            pass
+        # publish all motor states
+        for mid, jidx in zip(self.motor_ids, self.joint_indices):
+            jidx = int(jidx)
 
-        out = MitState()
-        out.stamp = self.get_clock().now().to_msg()
-        out.motor_id = self.motor_id
-        out.q = q
-        out.qd = qd
-        out.tau = tau
-        out.temp_c = 0.0
-        out.error_code = 0
-        self.pub_state.publish(out)
+            q = float(self.data.qpos[jidx])
+            qd = float(self.data.qvel[jidx])
+
+            tau = 0.0
+            try:
+                tau = float(self.data.qfrc_actuator[jidx])
+            except Exception:
+                pass
+
+            out = MitState()
+            out.stamp = now_msg
+            out.motor_id = int(mid)
+            out.q = q
+            out.qd = qd
+            out.tau = tau
+            out.temp_c = 0.0
+            out.error_code = 0
+            self.pub_state.publish(out)
 
         if self.viewer is not None:
             if self.viewer.is_running():
