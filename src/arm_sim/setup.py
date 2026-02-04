@@ -24,6 +24,8 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            'mujoco_mit_bridge = arm_sim.mujoco_mit_bridge:main',
         ],
+
     },
 )
