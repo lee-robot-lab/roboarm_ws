@@ -30,9 +30,8 @@
   - Publish: `/arm/mit_state` (`MitState`)
   - MIT 토크식으로 `data.ctrl[aidx]`(토크 입력) 생성:
 
-\[
+
 \tau = \tau_{ff} + k_p(q_{des}-q) + k_d(\dot q_{des} - \dot q)
-\]
 
 ---
 
