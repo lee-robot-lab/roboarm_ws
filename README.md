@@ -105,11 +105,11 @@ colcon build
 ```bash
 source /opt/ros/humble/setup.bash
 source ~/roboarm_ws/install/setup.bash
-ros2 launch arm_bringup mujoco_only.launch.py
+ros2 launch arm_bringup mujoco.launch.py
 ```
 #### Terminal 2) 중력보상 + 목표각 추종 실행
-```bashsource /opt/ros/humble/setup.bash
+```bash
+source /opt/ros/humble/setup.bash
 source ~/roboarm_ws/install/setup.bash
-
 ros2 run arm_control gravity_comp_controller
 ```
