@@ -14,7 +14,7 @@ setup(
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='su',
-    maintainer_email='su@todo.todo',
+    maintainer_email='lsu031111@hanyang.ac.kr',
     description='TODO: Package description',
     license='TODO: License declaration',
     extras_require={

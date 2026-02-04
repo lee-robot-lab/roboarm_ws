@@ -4,7 +4,7 @@
   <name>arm_driver</name>
   <version>0.0.0</version>
   <description>TODO: Package description</description>
-  <maintainer email="su@todo.todo">su</maintainer>
+  <maintainer email="lsu031111@hanyang.ac.kr">su</maintainer>
   <license>TODO: License declaration</license>
 
   <depend>rclpy</depend>
