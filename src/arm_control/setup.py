@@ -24,6 +24,8 @@ setup(
     },
     entry_points={
         'console_scripts': ['mit_hold = arm_control.mit_hold:main',
+                            'gravity_comp_controller = arm_control.gravity_comp_controller:main',
+
 
         ],
     },
