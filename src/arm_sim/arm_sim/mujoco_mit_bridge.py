@@ -1,6 +1,7 @@
 import mujoco
 import mujoco.viewer
 
+import math
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy
@@ -72,35 +73,66 @@ class MujocoMitBridge(Node):
             return
         self.latest_cmd[mid] = msg
 
+    
+
     def step_and_publish(self):
-        # apply all motor commands
+        # apply all motor commands (MIT-style torque)
         for mid, jidx, aidx in zip(self.motor_ids, self.joint_indices, self.actuator_indices):
-            cmd = self.latest_cmd[int(mid)]
-            self.data.ctrl[int(aidx)] = float(cmd.q_des)
+            mid = int(mid)
+            jidx = int(jidx)
+            aidx = int(aidx)
+
+            cmd = self.latest_cmd[mid]
+
+            q  = float(self.data.qpos[jidx])
+            qd = float(self.data.qvel[jidx])
+
+            tau = float(cmd.tau_ff) \
+                + float(cmd.kp) * (float(cmd.q_des) - q) \
+                + float(cmd.kd) * (float(cmd.qd_des) - qd)
+
+            # safety: NaN/inf 방지
+            if not math.isfinite(tau):
+                tau = 0.0
+
+            # optional: MJCF ctrlrange로 한번 더 클램프(정격 제한 유지)
+            try:
+                lo, hi = self.model.actuator_ctrlrange[aidx]
+                if self.model.actuator_ctrllimited[aidx]:
+                    tau = max(lo, min(hi, tau))
+            except Exception:
+                pass
+
+            self.data.ctrl[aidx] = tau
 
         mujoco.mj_step(self.model, self.data)
 
         now_msg = self.get_clock().now().to_msg()
 
         # publish all motor states
-        for mid, jidx in zip(self.motor_ids, self.joint_indices):
-            jidx = int(jidx)
+        for mid, jidx, aidx in zip(self.motor_ids, self.joint_indices, self.actuator_indices):
+            mid = int(mid); jidx = int(jidx); aidx = int(aidx)
 
-            q = float(self.data.qpos[jidx])
+            q  = float(self.data.qpos[jidx])
             qd = float(self.data.qvel[jidx])
 
-            tau = 0.0
+            # actuator가 실제로 낸 토크(가능하면 이게 제일 직관적)
+            tau_meas = 0.0
             try:
-                tau = float(self.data.qfrc_actuator[jidx])
+                tau_meas = float(self.data.actuator_force[aidx])
             except Exception:
-                pass
+                # fallback
+                try:
+                    tau_meas = float(self.data.qfrc_actuator[jidx])
+                except Exception:
+                    pass
 
             out = MitState()
             out.stamp = now_msg
-            out.motor_id = int(mid)
+            out.motor_id = mid
             out.q = q
             out.qd = qd
-            out.tau = tau
+            out.tau = tau_meas
             out.temp_c = 0.0
             out.error_code = 0
             self.pub_state.publish(out)
@@ -110,7 +142,6 @@ class MujocoMitBridge(Node):
                 self.viewer.sync()
             else:
                 self.viewer = None
-
 
 def main():
     rclpy.init()
