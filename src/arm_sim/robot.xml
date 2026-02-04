@@ -3,6 +3,8 @@
   <option timestep="0.002" gravity="0 0 -9.81" integrator="RK4"/>
   <size njmax="2000" nconmax="2000"/>
 
+  <option timestep="0.005" gravity="0 0 -9.81"/>
+  
   <default>
     <joint limited="true" damping="0.5" armature="0.01"/>
     <geom contype="1" conaffinity="1" friction="1 0.1 0.1" solref="0.01 1" solimp="0.9 0.95 0.001"/>
@@ -120,10 +122,28 @@
   </worldbody>
 
   <actuator>
-    <!-- For “it moves” testing: position servos -->
-    <position name="a_j1" joint="j1" kp="50"/>
-    <position name="a_j2" joint="j2" kp="50"/>
-    <position name="a_j3" joint="j3" kp="50"/>
-    <position name="a_j4" joint="j4" kp="50"/>
+    <!-- RS02 joints: rated 6 Nm, peak 17 Nm -->
+    <motor name="a_j1" joint="j1"
+            gear="1"
+            ctrllimited="true" ctrlrange="-6 6"
+            forcelimited="true" forcerange="-17 17"/>
+
+    <!-- RS03 joint: rated 20 Nm, peak(limit) 60 Nm -->
+    <motor name="a_j2" joint="j2"
+            gear="1"
+            ctrllimited="true" ctrlrange="-20 20"
+            forcelimited="true" forcerange="-60 60"/>
+
+    <!-- RS02 joints -->
+    <motor name="a_j3" joint="j3"
+            gear="1"
+            ctrllimited="true" ctrlrange="-6 6"
+            forcelimited="true" forcerange="-17 17"/>
+
+    <motor name="a_j4" joint="j4"
+            gear="1"
+            ctrllimited="true" ctrlrange="-6 6"
+            forcelimited="true" forcerange="-17 17"/>
   </actuator>
+
 </mujoco>
