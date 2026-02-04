@@ -15,6 +15,7 @@ setup(
         # ✅ install MuJoCo assets into share/arm_sim
         (os.path.join('share', package_name), ['robot.xml']),
         (os.path.join('share', package_name, 'meshes'), glob('meshes/*')),
+        (os.path.join('share', package_name, 'urdf'), glob('urdf/*.urdf')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
