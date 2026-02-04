@@ -23,7 +23,8 @@ setup(
         ],
     },
     entry_points={
-        'console_scripts': [
+        'console_scripts': ['mit_hold = arm_control.mit_hold:main',
+
         ],
     },
 )
