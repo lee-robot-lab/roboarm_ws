@@ -15,3 +15,15 @@ __pycache__/
 # IDE
 .vscode/
 .idea/
+
+# colcon
+build/
+install/
+log/
+
+# python
+__pycache__/
+*.pyc
+
+# editor
+.vscode/
