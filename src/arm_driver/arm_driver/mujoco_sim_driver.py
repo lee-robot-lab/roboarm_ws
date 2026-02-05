@@ -1,17 +1,18 @@
 import mujoco
 import mujoco.viewer
+import os  # 추가됨
 
 import math
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy
+from ament_index_python.packages import get_package_share_directory # 추가됨
 
 from arm_msgs.msg import MitCommand, MitState
 
-
 class MujocoMitBridge(Node):
     def __init__(self):
-        super().__init__("mujoco_mit_bridge")
+        super().__init__("mujoco_sim_driver")
 
         self.declare_parameter("xml_path", "robot.xml")
         self.declare_parameter("publish_hz", 200.0)
@@ -22,7 +23,7 @@ class MujocoMitBridge(Node):
         self.declare_parameter("joint_indices", [0, 1, 2, 3])
         self.declare_parameter("actuator_indices", [0, 1, 2, 3])
 
-        xml_path = self.get_parameter("xml_path").value
+        xml_path_param = self.get_parameter("xml_path").value
         self.hz = float(self.get_parameter("publish_hz").value)
         self.use_viewer = bool(self.get_parameter("use_viewer").value)
 
@@ -42,7 +43,32 @@ class MujocoMitBridge(Node):
         self.pub_state = self.create_publisher(MitState, "/arm/mit_state", qos)
         self.sub_cmd = self.create_subscription(MitCommand, "/arm/mit_cmd", self.on_cmd, qos)
 
-        self.model = mujoco.MjModel.from_xml_path(xml_path)
+        # [핵심 수정] XML 파일의 경로 문제를 해결하는 로직
+        self.get_logger().info(f"Loading XML from: {xml_path_param}")
+        
+        # 1. XML 파일을 문자열로 읽어옵니다.
+        with open(xml_path_param, 'r') as f:
+            xml_content = f.read()
+
+        # 2. 'arm_description' 패키지의 실제 설치 경로를 찾습니다.
+        try:
+            pkg_path = get_package_share_directory('arm_description')
+            mesh_abs_path = os.path.join(pkg_path, 'meshes')
+            
+            # 3. XML 안의 상대 경로(../arm_description/meshes)를 절대 경로로 교체합니다.
+            #    (robot.xml에 적어둔 경로 문자열과 정확히 일치해야 합니다)
+            target_str = "../arm_description/meshes"
+            if target_str in xml_content:
+                self.get_logger().info(f"Replacing '{target_str}' with '{mesh_abs_path}'")
+                xml_content = xml_content.replace(target_str, mesh_abs_path)
+            else:
+                self.get_logger().warn(f"'{target_str}' not found in XML. Mesh loading might fail.")
+
+        except Exception as e:
+            self.get_logger().error(f"Failed to resolve mesh path: {e}")
+
+        # 4. 수정된 내용(문자열)으로 MuJoCo 모델을 로드합니다.
+        self.model = mujoco.MjModel.from_xml_string(xml_content)
         self.data = mujoco.MjData(self.model)
 
         # latest commands per motor_id
@@ -52,7 +78,7 @@ class MujocoMitBridge(Node):
             cmd.motor_id = int(mid)
             cmd.q_des = 0.0
             cmd.qd_des = 0.0
-            cmd.kp = 20.0
+            cmd.kp = 10.0 # 안전을 위해 기본 게인 약간 낮춤
             cmd.kd = 0.5
             cmd.tau_ff = 0.0
             self.latest_cmd[int(mid)] = cmd
@@ -62,18 +88,13 @@ class MujocoMitBridge(Node):
             self.viewer = mujoco.viewer.launch_passive(self.model, self.data)
 
         self.timer = self.create_timer(1.0 / self.hz, self.step_and_publish)
-        self.get_logger().info(
-            f"Loaded MJCF: {xml_path} | hz={self.hz} | motors={self.motor_ids} "
-            f"| joints={self.joint_indices} | actuators={self.actuator_indices}"
-        )
+        self.get_logger().info("Simulation Started Successfully!")
 
     def on_cmd(self, msg: MitCommand):
         mid = int(msg.motor_id)
         if mid not in self.latest_cmd:
             return
         self.latest_cmd[mid] = msg
-
-    
 
     def step_and_publish(self):
         # apply all motor commands (MIT-style torque)
@@ -116,12 +137,11 @@ class MujocoMitBridge(Node):
             q  = float(self.data.qpos[jidx])
             qd = float(self.data.qvel[jidx])
 
-            # actuator가 실제로 낸 토크(가능하면 이게 제일 직관적)
+            # actuator가 실제로 낸 토크
             tau_meas = 0.0
             try:
                 tau_meas = float(self.data.actuator_force[aidx])
             except Exception:
-                # fallback
                 try:
                     tau_meas = float(self.data.qfrc_actuator[jidx])
                 except Exception:
@@ -152,7 +172,6 @@ def main():
         pass
     node.destroy_node()
     rclpy.shutdown()
-
 
 if __name__ == "__main__":
     main()

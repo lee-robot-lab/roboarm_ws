@@ -1,3 +1,31 @@
+"""
+mit_bridge.py  (ROS2 node: mit_bridge)
+
+[역할]
+- MuJoCo MIT 인터페이스와 일반 ROS 토픽(/joint_states, /joint_trajectory)을 연결하는 실행/브릿지 노드.
+
+[구독(Subscribe)]
+- /arm/mit_state (arm_msgs/msg/MitState)
+  - MuJoCo가 모터 단위 상태를 발행 (motor_id, q, qd, tau, ...)
+  - 퍼블리셔 QoS가 BEST_EFFORT인 경우가 있어, 구독 QoS를 sensor_data로 맞춰야 수신 가능
+
+- /joint_trajectory (trajectory_msgs/msg/JointTrajectory)
+  - ik_planner_node가 생성한 trajectory
+  - 이를 시간에 따라 샘플링하여 모터 명령으로 변환
+
+[발행(Publish)]
+- /joint_states (sensor_msgs/msg/JointState)
+  - 모터별 상태를 4축(j1~j4)으로 묶어 publish (플래너/기타 노드 호환용)
+
+- /arm/mit_cmd (arm_msgs/msg/MitCommand)
+  - motor_id, q_des, qd_des, kp, kd, tau_ff를 모터 단위로 스트리밍 발행
+  - mujoco_mit_bridge가 이 토픽을 구독하여 로봇을 실제로 움직인다.
+
+[주의]
+- /joint_trajectory는 기본이 VOLATILE이라, mit_bridge가 먼저 떠 있어야 trajectory를 놓치지 않는다.
+  (개선 가능) 플래너 publisher를 TRANSIENT_LOCAL로 변경하면 늦게 떠도 마지막 trajectory를 받을 수 있음.
+"""
+
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data, QoSProfile, ReliabilityPolicy, HistoryPolicy

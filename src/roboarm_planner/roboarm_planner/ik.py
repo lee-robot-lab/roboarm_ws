@@ -1,3 +1,29 @@
+"""
+ik.py
+
+[역할]
+- position-only Inverse Kinematics(IK) 해결 모듈.
+- 목표 end-effector 위치 p_des(base 기준)에 도달하는 관절각 q를 수치 최적화로 찾는다.
+- 여러 초기값(multi-start)을 사용하고, 비용함수로 '최적 자세'를 선택한다.
+
+[최적화 기준(현재 프로젝트)]
+1) 위치 오차 최소화: || FK(q) - p_des ||
+2) 현재 자세에서 덜 움직이기: || q - q_now ||
+3) 관절 제한 회피: joint limit 근처 페널티(soft barrier)
+
+[입력]
+- robot: RobotModel (fk_pos 제공)
+- p_des: 목표 위치 (x,y,z)
+- q_now: 현재 관절각 (최적해 선택 기준)
+
+[출력]
+- q_star: 선택된 최적 관절각
+- info: cost, 반복횟수 등 디버깅 정보
+
+[확장 포인트]
+- 특이점 회피(자코비안 SVD 기반), 충돌 회피, 토크/에너지 최소 등의 항 추가 가능
+"""
+
 import numpy as np
 from scipy.optimize import least_squares
 
