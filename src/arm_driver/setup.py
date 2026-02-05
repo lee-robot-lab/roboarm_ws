@@ -24,6 +24,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            'mujoco_sim_driver = arm_driver.mujoco_sim_driver:main',
         ],
     },
 )

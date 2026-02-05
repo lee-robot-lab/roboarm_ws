@@ -1,3 +1,32 @@
+"""
+plan_node.py  (ROS2 node: ik_planner_node)
+
+[역할]
+- /goal_point(목표 위치)를 받아 IK를 풀고,
+  q_now -> q_star joint trajectory(/joint_trajectory)를 생성해 publish 하는 '플래너' 노드.
+
+[구독(Subscribe)]
+- /joint_states (sensor_msgs/JointState)
+  현재 관절각 q_now 획득
+
+- /goal_point (geometry_msgs/PointStamped)
+  목표 end-effector 위치 (frame_id는 base 권장)
+
+[발행(Publish)]
+- /joint_trajectory (trajectory_msgs/JointTrajectory)
+  q_now -> q_star 궤적
+
+[주의]
+- 테스트 시 goal을 반복 발행하면 계속 재계획되므로,
+  `ros2 topic pub -1 ...` 처럼 1회 발행을 권장한다.
+
+[연관 파일]
+- robot_model.py: FK 계산
+- ik.py: IK 해결
+- traj.py: trajectory 생성
+- mit_bridge.py: trajectory를 /arm/mit_cmd로 실행(스트리밍)
+"""
+
 import os
 import numpy as np
 import rclpy

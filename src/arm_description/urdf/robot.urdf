@@ -11,17 +11,16 @@
     </inertial>
     <visual>
       <geometry>
-        <mesh filename="file:///home/su/my_robot/meshes/base.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://arm_description/meshes/base.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="file:///home/su/my_robot/meshes/base.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://arm_description/meshes/base.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </collision>
   </link>
 
-  <!-- RS02 motors: same inertial, different link names -->
   <link name="rs02_1">
     <inertial>
       <origin xyz="0 0 0.027" rpy="0 0 0"/>
@@ -32,12 +31,12 @@
     </inertial>
     <visual>
       <geometry>
-        <mesh filename="file:///home/su/my_robot/meshes/RS02(0.0.0).stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://arm_description/meshes/RS02(0.0.0).stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="file:///home/su/my_robot/meshes/RS02(0.0.0).stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://arm_description/meshes/RS02(0.0.0).stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </collision>
   </link>
@@ -52,12 +51,12 @@
     </inertial>
     <visual>
       <geometry>
-        <mesh filename="file:///home/su/my_robot/meshes/RS02(0.0.0).stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://arm_description/meshes/RS02(0.0.0).stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="file:///home/su/my_robot/meshes/RS02(0.0.0).stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://arm_description/meshes/RS02(0.0.0).stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </collision>
   </link>
@@ -72,12 +71,12 @@
     </inertial>
     <visual>
       <geometry>
-        <mesh filename="file:///home/su/my_robot/meshes/RS02(0.0.0).stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://arm_description/meshes/RS02(0.0.0).stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="file:///home/su/my_robot/meshes/RS02(0.0.0).stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://arm_description/meshes/RS02(0.0.0).stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </collision>
   </link>
@@ -92,12 +91,12 @@
     </inertial>
     <visual>
       <geometry>
-        <mesh filename="file:///home/su/my_robot/meshes/RS03(0.0.0).stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://arm_description/meshes/RS03(0.0.0).stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="file:///home/su/my_robot/meshes/RS03(0.0.0).stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://arm_description/meshes/RS03(0.0.0).stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </collision>
   </link>
@@ -112,12 +111,12 @@
     </inertial>
     <visual>
       <geometry>
-        <mesh filename="file:///home/su/my_robot/meshes/joint1.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://arm_description/meshes/joint1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="file:///home/su/my_robot/meshes/joint1.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://arm_description/meshes/joint1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </collision>
   </link>
@@ -132,12 +131,12 @@
     </inertial>
     <visual>
       <geometry>
-        <mesh filename="file:///home/su/my_robot/meshes/link1_1.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://arm_description/meshes/link1_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="file:///home/su/my_robot/meshes/link1_1.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://arm_description/meshes/link1_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </collision>
   </link>
@@ -152,12 +151,12 @@
     </inertial>
     <visual>
       <geometry>
-        <mesh filename="file:///home/su/my_robot/meshes/link1_2.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://arm_description/meshes/link1_2.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="file:///home/su/my_robot/meshes/link1_2.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://arm_description/meshes/link1_2.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </collision>
   </link>
@@ -172,12 +171,12 @@
     </inertial>
     <visual>
       <geometry>
-        <mesh filename="file:///home/su/my_robot/meshes/link1_3.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://arm_description/meshes/link1_3.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="file:///home/su/my_robot/meshes/link1_3.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://arm_description/meshes/link1_3.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </collision>
   </link>
@@ -192,12 +191,12 @@
     </inertial>
     <visual>
       <geometry>
-        <mesh filename="file:///home/su/my_robot/meshes/joint2.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://arm_description/meshes/joint2.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="file:///home/su/my_robot/meshes/joint2.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://arm_description/meshes/joint2.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </collision>
   </link>
@@ -212,12 +211,12 @@
     </inertial>
     <visual>
       <geometry>
-        <mesh filename="file:///home/su/my_robot/meshes/link2.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://arm_description/meshes/link2.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="file:///home/su/my_robot/meshes/link2.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://arm_description/meshes/link2.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </collision>
   </link>
@@ -289,15 +288,12 @@
     <axis xyz="0 0 1"/>
     <limit lower="-3.14159" upper="3.14159" effort="50" velocity="100"/>
   </joint>
-    <!-- End-effector frame (adjust xyz to the real tip) -->
-  <link name="ee_link"/>
+    <link name="ee_link"/>
 
   <joint name="ee_fixed" type="fixed">
     <parent link="link2"/>
     <child  link="ee_link"/>
-    <!-- TODO: 아래 xyz를 link2 '끝점'으로 맞추면 됨 -->
     <origin xyz="0 0 0.265" rpy="0 0 0"/>
   </joint>
-
 
 </robot>

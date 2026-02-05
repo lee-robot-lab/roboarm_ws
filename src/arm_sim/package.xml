@@ -3,17 +3,12 @@
 <package format="3">
   <name>arm_sim</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="lsu031111@hanyang.ac.kr">su</maintainer>
-  <license>TODO: License declaration</license>
+  <description>Simulation environment configs</description>
+  <maintainer email="user@todo.todo">user</maintainer>
+  <license>Apache-2.0</license>
 
-  <depend>rclpy</depend>
-  <exec_depend>arm_msgs</exec_depend>
-
-  <test_depend>ament_copyright</test_depend>
-  <test_depend>ament_flake8</test_depend>
-  <test_depend>ament_pep257</test_depend>
-  <test_depend>python3-pytest</test_depend>
+  <buildtool_depend>ament_python</buildtool_depend>
+  <exec_depend>arm_description</exec_depend>
 
   <export>
     <build_type>ament_python</build_type>
