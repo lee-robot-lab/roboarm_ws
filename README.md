@@ -1,115 +1,153 @@
-# roboarm_ws
-# RoboArm ROS2 Workspace (MuJoCo + MIT mode + Gravity Compensation)
+# RoboArm ROS2 Workspace (`roboarm_ws`)
 
-이 워크스페이스는 **MIT 모드(τ = PD + τ_ff)** 형태의 제어 인터페이스를 ROS2 토픽으로 통일하고,  
-**MuJoCo 시뮬레이션 ↔ 컨트롤(Pinocchio 중력보상) ↔ 추후 실기기(CAN)** 를 동일한 메시지로 갈아끼우는 구조를 목표로 합니다.
-
----
-
-## Package Overview
-
-### `arm_msgs`
-**공통 인터페이스 메시지 패키지**
-- `MitCommand` : 모터 명령 (MIT mode)
-  - `motor_id, q_des, qd_des, kp, kd, tau_ff, stamp ...`
-- `MitState` : 모터 상태
-  - `motor_id, q, qd, tau, stamp ...`
-
-> 시뮬/컨트롤/실기기 모두 동일한 토픽 타입을 사용합니다.
+ROS 2 Humble 기반의 4축 로보암 워크스페이스입니다.  
+핵심 목표는 **MIT 모드 토픽 인터페이스(`arm_msgs`)를 중심으로** 시뮬레이터/컨트롤러/플래너를 느슨하게 결합하는 것입니다.
 
 ---
 
-### `arm_sim`
-**MuJoCo 플랜트 + ROS 브릿지**
-- `robot.xml` (MJCF)
-  - 로봇 모델/관성/충돌 포함
-  - actuator를 `<position>` 서보에서 `<motor>`(토크 입력)로 변경
-  - 정격/피크 토크 범위는 `ctrlrange/forcerange`로 제한
-- `mujoco_mit_bridge.py`
-  - Subscribe: `/arm/mit_cmd` (`MitCommand`)
-  - Publish: `/arm/mit_state` (`MitState`)
-  - MIT 토크식으로 `data.ctrl[aidx]`(토크 입력) 생성:
+## 1) 패키지 구성
 
+- `arm_msgs`: 공통 메시지 (`MitCommand`, `MitState`)
+- `arm_description`: URDF + mesh 리소스
+- `arm_sim`: MuJoCo XML 리소스 패키지 (`robot.xml`)
+- `arm_driver`: MuJoCo 시뮬레이션 드라이버 노드 (`mujoco_sim_driver`)
+- `arm_control`: 제어 노드 (`gravity_comp_controller`)
+- `roboarm_planner`: IK/trajectory/bridge/planner 노드 (`mit_bridge`, `ik_planner_node`)
+- `arm_bringup`: launch 모음
 
-\tau = \tau_{ff} + k_p(q_{des}-q) + k_d(\dot q_{des} - \dot q)
+파일 인덱스: `docs/FILE_INDEX.md`
 
 ---
 
-### `arm_control`
-**컨트롤 노드**
-- `mit_hold.py`
-  - 테스트용 목표각 홀드(PD)
-  - `/arm/mit_cmd` publish
-- `gravity_comp_controller.py`
-  - Pinocchio 기반 중력항 \(g(q)\) 계산 → `tau_ff`로 출력
-  - PD + 중력보상 결합으로 목표각 추종/자세 유지
+## 2) 런타임 구조
 
-> ⚠️ 개념 정리  
-> - `kp=kd=0`이면 “목표각으로 이동”은 불가능합니다. (토크 = τ_ff만 남음)  
-> - 목표 이동은 PD가 담당, 중력 상쇄는 `tau_ff`가 담당합니다.
+### 현재 launch 파일
+- `arm_bringup/launch/mujoco.launch.py`
+  - MuJoCo 드라이버 노드(`arm_driver/mujoco_sim_driver`) 실행
+  - 주요 인자: `xml_path`, `publish_hz`
 
----
+### 주요 토픽
+- 드라이버
+  - Sub: `/arm/mit_cmd` (`arm_msgs/MitCommand`)
+  - Pub: `/arm/mit_state` (`arm_msgs/MitState`)
+- 중력보상 컨트롤러
+  - Sub: `/arm/mit_state`
+  - Pub: `/arm/mit_cmd`
+- 플래너 체인
+  - `mit_bridge`: `/arm/mit_state` -> `/joint_states`, `/joint_trajectory` -> `/arm/mit_cmd`
+  - `ik_planner_node`: `/goal_point` -> `/joint_trajectory`
 
-### `arm_bringup`
-**실행 구성(launch)**
-- 보통 “플랜트(MuJoCo)”와 “컨트롤러”를 분리 실행합니다.
-- `/arm/mit_cmd` 충돌 방지를 위해 컨트롤러는 1개만 켭니다.
-
----
-
-## Topic Graph
-
-- `arm_sim/mujoco_mit_bridge`
-  - pub: `/arm/mit_state`
-  - sub: `/arm/mit_cmd`
-
-- `arm_control/*` (컨트롤러들)
-  - sub: `/arm/mit_state`
-  - pub: `/arm/mit_cmd`
-
-> ⚠️ `/arm/mit_cmd`는 **publisher 1개만** 유지해야 합니다.  
-> (컨트롤러 2개가 동시에 publish하면 명령이 섞여 충돌합니다.)
+> `/arm/mit_cmd` 퍼블리셔는 동시에 1개만 실행하세요.  
+> (예: `gravity_comp_controller`와 `mit_bridge`를 동시에 사용하면 명령이 충돌할 수 있습니다.)
 
 ---
 
-## Quick Start (Clone → Build → Run)
+## 3) 코드 실행법
 
----
+### 3-1) 최초 1회: 의존성 + 빌드
 
-### 0) Clone (GitHub에서 워크스페이스 받기)
 ```bash
-cd ~
-git clone git@github.com:lee-robot-lab/roboarm_ws.git
-cd roboarm_ws
-```
+cd ~/roboarm_ws
+source /opt/ros/humble/setup.bash
 
-
-### 1) 의존성 설치
-```bash
 sudo apt update
 rosdep update
-cd ~/roboarm_ws
 rosdep install --from-paths src --ignore-src -r -y
-```
 
-### 2) Build
-```bash
-source /opt/ros/humble/setup.bash
-cd ~/roboarm_ws
 colcon build
 ```
-### 3) 실행: MuJoCo 시뮬 + 컨트롤러 (터미널 2개)
 
+### 3-2) 실행 전 공통 준비 (매 터미널)
 
-#### Terminal 1) MuJoCo 플랜트 실행 (시뮬레이터)
 ```bash
 source /opt/ros/humble/setup.bash
 source ~/roboarm_ws/install/setup.bash
+```
+
+---
+
+## 4) 시나리오별 실행
+
+## A. 기본 시뮬레이션 + 중력보상 제어
+
+### Terminal 1: MuJoCo 드라이버 실행
+```bash
 ros2 launch arm_bringup mujoco.launch.py
 ```
-#### Terminal 2) 중력보상 + 목표각 추종 실행
+
+`publish_hz` 변경 예시:
 ```bash
-source /opt/ros/humble/setup.bash
-source ~/roboarm_ws/install/setup.bash
+ros2 launch arm_bringup mujoco.launch.py publish_hz:=200.0
+```
+
+### Terminal 2: 중력보상 컨트롤러 실행
+```bash
 ros2 run arm_control gravity_comp_controller
 ```
+
+게인/목표각 파라미터 예시:
+```bash
+ros2 run arm_control gravity_comp_controller --ros-args \
+  -p kp:=30.0 -p kd:=1.0 \
+  -p q_targets:='[0.0, 1.57, 0.0, 0.0]'
+```
+
+---
+
+## B. 목표 위치 기반 플래닝 실행 (`/goal_point` 사용)
+
+아래 체인은 **`gravity_comp_controller` 대신** 사용하세요.
+
+### Terminal 1: MuJoCo 드라이버
+```bash
+ros2 launch arm_bringup mujoco.launch.py
+```
+
+### Terminal 2: MIT 브릿지
+```bash
+ros2 run roboarm_planner mit_bridge
+```
+
+### Terminal 3: IK 플래너
+> `ik_planner_node`는 `urdf_path`를 명시해 실행하는 것을 권장합니다.
+
+```bash
+ros2 run roboarm_planner ik_planner_node --ros-args \
+  -p urdf_path:=$HOME/roboarm_ws/src/arm_description/urdf/robot.urdf \
+  -p base_frame:=base -p ee_frame:=ee_link
+```
+
+### Terminal 4: 목표 위치 1회 발행
+```bash
+ros2 topic pub -1 /goal_point geometry_msgs/msg/PointStamped \
+"{header: {frame_id: 'base'}, point: {x: 0.20, y: 0.00, z: 0.25}}"
+```
+
+---
+
+## 5) 실행 확인 커맨드
+
+### 토픽 연결 확인
+```bash
+ros2 topic list
+ros2 topic info /arm/mit_cmd
+ros2 topic info /arm/mit_state
+ros2 topic info /goal_point
+ros2 topic info /joint_trajectory
+```
+
+### 상태/궤적 확인
+```bash
+ros2 topic echo /arm/mit_state --once
+ros2 topic echo /joint_trajectory --once
+```
+
+---
+
+## 6) 유지보수 팁
+
+- 파일 인덱스 갱신:
+```bash
+python3 tools/repo_inventory.py
+```
+- launch/README를 함께 수정해 실제 실행 경로와 문서를 항상 일치시키세요.
