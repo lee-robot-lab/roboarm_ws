@@ -64,7 +64,8 @@ source /opt/ros/humble/setup.bash
 source ~/roboarm_ws/install/setup.bash
 ```
 
----
+colcon build
+```
 
 ## 4) 시나리오별 실행
 
@@ -92,7 +93,7 @@ ros2 run arm_control gravity_comp_controller --ros-args \
   -p q_targets:='[0.0, 1.57, 0.0, 0.0]'
 ```
 
----
+### Terminal 1: MuJoCo 드라이버
 
 ## B. 목표 위치 기반 플래닝 실행 (`/goal_point` 사용)
 
