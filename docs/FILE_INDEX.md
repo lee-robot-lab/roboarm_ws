@@ -8,7 +8,6 @@
 
 - `src/arm_bringup/arm_bringup/__init__.py`
 - `src/arm_bringup/launch/mujoco.launch.py`
-- `src/arm_bringup/launch/mujoco_mit_demo.launch.py`
 - `src/arm_bringup/package.xml`
 - `src/arm_bringup/resource/arm_bringup`
 - `src/arm_bringup/setup.cfg`
@@ -21,7 +20,6 @@
 
 - `src/arm_control/arm_control/__init__.py`
 - `src/arm_control/arm_control/gravity_comp_controller.py`
-- `src/arm_control/arm_control/mit_hold.py`
 - `src/arm_control/package.xml`
 - `src/arm_control/resource/arm_control`
 - `src/arm_control/setup.cfg`
@@ -30,9 +28,31 @@
 - `src/arm_control/test/test_flake8.py`
 - `src/arm_control/test/test_pep257.py`
 
+### arm_description
+
+- `src/arm_description/arm_description/__init__.py`
+- `src/arm_description/meshes/RS02(0.0.0).stl`
+- `src/arm_description/meshes/RS03(0.0.0).stl`
+- `src/arm_description/meshes/base.stl`
+- `src/arm_description/meshes/joint1.stl`
+- `src/arm_description/meshes/joint2.stl`
+- `src/arm_description/meshes/link1_1.stl`
+- `src/arm_description/meshes/link1_2.stl`
+- `src/arm_description/meshes/link1_3.stl`
+- `src/arm_description/meshes/link2.stl`
+- `src/arm_description/package.xml`
+- `src/arm_description/resource/arm_description`
+- `src/arm_description/setup.cfg`
+- `src/arm_description/setup.py`
+- `src/arm_description/test/test_copyright.py`
+- `src/arm_description/test/test_flake8.py`
+- `src/arm_description/test/test_pep257.py`
+- `src/arm_description/urdf/robot.urdf`
+
 ### arm_driver
 
 - `src/arm_driver/arm_driver/__init__.py`
+- `src/arm_driver/arm_driver/mujoco_sim_driver.py`
 - `src/arm_driver/package.xml`
 - `src/arm_driver/resource/arm_driver`
 - `src/arm_driver/setup.cfg`
@@ -50,17 +70,6 @@
 
 ### arm_sim
 
-- `src/arm_sim/arm_sim/__init__.py`
-- `src/arm_sim/arm_sim/mujoco_mit_bridge.py`
-- `src/arm_sim/meshes/RS02(0.0.0).stl`
-- `src/arm_sim/meshes/RS03(0.0.0).stl`
-- `src/arm_sim/meshes/base.stl`
-- `src/arm_sim/meshes/joint1.stl`
-- `src/arm_sim/meshes/joint2.stl`
-- `src/arm_sim/meshes/link1_1.stl`
-- `src/arm_sim/meshes/link1_2.stl`
-- `src/arm_sim/meshes/link1_3.stl`
-- `src/arm_sim/meshes/link2.stl`
 - `src/arm_sim/package.xml`
 - `src/arm_sim/resource/arm_sim`
 - `src/arm_sim/robot.xml`
@@ -69,7 +78,6 @@
 - `src/arm_sim/test/test_copyright.py`
 - `src/arm_sim/test/test_flake8.py`
 - `src/arm_sim/test/test_pep257.py`
-- `src/arm_sim/urdf/robot.urdf`
 
 ### roboarm_planner
 
@@ -92,4 +100,5 @@
 
 - `.gitignore`
 - `README.md`
+- `docs/FILE_INDEX.md`
 - `tools/repo_inventory.py`
