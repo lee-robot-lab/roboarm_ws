@@ -101,24 +101,10 @@ ros2 run arm_control gravity_comp_controller --ros-args \
 
 ### Terminal 1: MuJoCo 드라이버
 ```bash
-ros2 launch arm_bringup mujoco.launch.py
+ros2 launch arm_bringup integration.launch.py
 ```
 
-### Terminal 2: MIT 브릿지
-```bash
-ros2 run roboarm_planner mit_bridge
-```
-
-### Terminal 3: IK 플래너
-> `ik_planner_node`는 `urdf_path`를 명시해 실행하는 것을 권장합니다.
-
-```bash
-ros2 run roboarm_planner ik_planner_node --ros-args \
-  -p urdf_path:=$HOME/roboarm_ws/src/arm_description/urdf/robot.urdf \
-  -p base_frame:=base -p ee_frame:=ee_link
-```
-
-### Terminal 4: 목표 위치 1회 발행
+### Terminal 2: 목표 위치 1회 발행
 ```bash
 ros2 topic pub -1 /goal_point geometry_msgs/msg/PointStamped \
 "{header: {frame_id: 'base'}, point: {x: 0.20, y: 0.00, z: 0.25}}"
