@@ -41,7 +41,7 @@ from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 from .robot_model import RobotModel
 from .ik import solve_ik_position_only
 from .traj import make_quintic_joint_traj
-pkg_share = get_package_share_directory("arm_sim")
+pkg_share = get_package_share_directory("arm_description") 
 urdf_path = os.path.join(pkg_share, "urdf", "robot.urdf")
 
 ee_frame = "ee_link"

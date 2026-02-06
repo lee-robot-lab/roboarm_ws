@@ -20,7 +20,8 @@
     <mesh name="link1_2_mesh"  file="link1_2.stl"        scale="0.001 0.001 0.001"/>
     <mesh name="link1_3_mesh"  file="link1_3.stl"        scale="0.001 0.001 0.001"/>
     <mesh name="joint2_mesh"   file="joint2.stl"         scale="0.001 0.001 0.001"/>
-    <mesh name="link2_mesh"    file="link2.stl"          scale="0.001 0.001 0.001"/>
+    <mesh name="link2_1_mesh"    file="link2_1.stl"          scale="0.001 0.001 0.001"/>
+    <mesh name="link2_2_mesh"    file="link2_2.stl"          scale="0.001 0.001 0.001"/>
   </asset>
 
   <worldbody>
@@ -102,12 +103,20 @@
                         <geom type="mesh" mesh="rs02_mesh"/>
 
                         <!-- j4 -->
-                        <body name="link2" pos="0 0 0">
+                        <body name="link2_1" pos="0 0 0">
                           <joint name="j4" type="hinge" axis="0 0 1" range="-3.14159 3.14159"/>
                           <inertial pos="0.000018 -0.000018 0.088036"
                                     mass="0.30867"
                                     fullinertia="0.002 0.002 0.001 -9.78e-10 1.852e-07 -1.833e-07"/>
-                          <geom type="mesh" mesh="link2_mesh"/>
+                          <geom type="mesh" mesh="link2_1_mesh"/>
+
+
+                          <body name="link2_2" pos="0 0 0.035">                    
+                            <inertial pos="0.000018 -0.000018 0.088036"
+                                    mass="0.30867"
+                                    fullinertia="0.002 0.002 0.001 -9.78e-10 1.852e-07 -1.833e-07"/>
+                            <geom type="mesh" mesh="link2_2_mesh"/>
+                          </body>
                         </body>
                       </body>
                     </body>
