@@ -64,8 +64,7 @@ source /opt/ros/humble/setup.bash
 source ~/roboarm_ws/install/setup.bash
 ```
 
-colcon build
-```
+
 
 ## 4) 시나리오별 실행
 
