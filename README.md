@@ -1,6 +1,10 @@
 # RoboArm ROS2 Workspace (`roboarm_ws`)
 
 ROS 2 Humble 기반의 4축 로보암 워크스페이스입니다.  
+
+> **상태 (Status):** 6축 팔을 만들기 전에 설계 참고용으로 돌려본 **4축 팔의 MuJoCo 시뮬레이션 워크스페이스**입니다. 실기 하드웨어(CAN) 코드는 포함하지 않습니다. 6축 팔의 제어·CAN 코드는 [`idle_ws`](https://github.com/lee-robot-lab/idle_ws)에 있습니다.  
+> *Design-reference simulation of a 4-axis arm, run before building the 6-DoF arm. It contains no real-hardware (CAN) code; the 6-DoF arm's control and CAN code is in `idle_ws`.*
+
 핵심 목표는 **MIT 모드 토픽 인터페이스(`arm_msgs`)를 중심으로** 시뮬레이터/컨트롤러/플래너를 느슨하게 결합하는 것입니다.
 
 ---
